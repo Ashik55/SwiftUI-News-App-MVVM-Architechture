@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     
+    @Environment(\.openURL) var openURL
     @StateObject var viewmodel = NewsViewmodelImp(service: NewsServiceImpl())
     
     var body: some View {
@@ -22,6 +23,9 @@ struct HomeView: View {
                 NavigationView{
                     List(articles){ item in
                         NewsItemView(article: item)
+                            .onTapGesture {
+                                load(url: item.url)
+                            }
                     }.navigationTitle(Text("News"))
                 }
             case .failed(error: let error):
@@ -30,6 +34,16 @@ struct HomeView: View {
             
         }.onAppear(perform: viewmodel.getArticles)
     }
+    
+    
+    func load(url : String?){
+        guard  let link = url,
+               let url = URL(string: link) else {return}
+        
+        openURL(url)
+    }
+    
+    
 }
 
 struct HomeView_Previews: PreviewProvider {
